@@ -1,0 +1,24 @@
+{
+  "name": "demo-tailwind",
+  "version": "0.0.1",
+  "description": "",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@uiw/react-md-editor": "^3.24.1",
+    "lodash": "^4.17.21",
+    "usehooks-ts": "^2.9.1"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.15",
+    "postcss": "^8.4.30",
+    "tailwindcss": "^3.3.3",
+    "vite": "^4.4.9"
+  }
+}

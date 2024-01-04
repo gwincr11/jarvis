@@ -1,0 +1,10 @@
+langchain
+openai
+python-dotenv
+SpeechRecognition
+PyAudio
+gTTS
+playsound
+flask
+flask-vite
+flask-cors
