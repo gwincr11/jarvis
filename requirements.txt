@@ -1,5 +1,7 @@
 langchain
-openai
+langchain_community
+spotipy
+crewai
 python-dotenv
 SpeechRecognition
 PyAudio
@@ -8,3 +10,7 @@ playsound
 flask
 flask-vite
 flask-cors
+tools
+
+openai
+duckduckgo-search
