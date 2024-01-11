@@ -1,22 +1,39 @@
-import json
 import webbrowser
 from textwrap import dedent
 
 import spotipy
-from crewai import Task
+from crewai import Agent, Task
 from dotenv import load_dotenv
-from langchain.agents import AgentExecutor, tool
-from langchain.pydantic_v1 import BaseModel, Field
-from spotipy.oauth2 import SpotifyClientCredentials, SpotifyOAuth
+from langchain.agents import tool
+from langchain.tools import DuckDuckGoSearchRun
+from spotipy.oauth2 import SpotifyOAuth
 
 load_dotenv()
-username = 'gwincr11'
 redirectURI = 'http://google.com/'
 
 scope = "user-library-read"
 
 spotifyObject = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope))
 user = spotifyObject.current_user()
+
+
+search_tool = DuckDuckGoSearchRun()
+
+
+def SpotifyAgent(llm):
+    return Agent(
+        role='Music Agent',
+        goal="""
+            Play music for the user and help them discover new music that they will love.
+            When you play a song do not ask questions, but tell some history of the song.
+            """,
+        backstory='You are a music agent, you have access to the spotify API and can play music for the user.',
+        tools=[
+            playSong, search_tool
+        ],
+        memory=False,
+        llm=llm,
+        verbose=True)
 
 
 class SpotifyTasks():
@@ -36,17 +53,11 @@ class SpotifyTasks():
             """
         for idx, item in enumerate(results['items']):
             prompt += f"{idx+1}) {item['track']['name']} by {item['track']['artists'][0]['name']}\n"
-        prompt += """The tool playSong must take a query parameter which is a string in the following format, replace with the correct information:
 
-            artist=REPLACE_WITH_ARTIST_NAME&track=REPLACE_WITH_TRACK_NAME
-
-        We must call it with both a track and an artist, neither can be null.
-        The tool will then search for the song and play it in the users browser.
-        Once that is done, complete a search about the song or artist.
-
-        The final step is to tell the user something interesting about the song.
-        """
         return Task(description=dedent(prompt), agent=agent)
+
+    def tellStory(self, agent):
+        return Task(description="Tell a story about the song you just played", agent=agent)
 
 
 @tool

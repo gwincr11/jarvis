@@ -3,7 +3,7 @@ from textwrap import dedent
 from crewai import Agent, Task
 from langchain.agents import tool
 from langchain.tools import DuckDuckGoSearchRun
-from spotify import SpotifyTasks, playSong
+from spotify import SpotifyAgent, SpotifyTasks, playSong
 
 search_tool = DuckDuckGoSearchRun()
 
@@ -41,9 +41,9 @@ class JarvisAgents():
 
     def default_agent(self, prompt):
         agent = Agent(
-            role='Life Coach and Assitant',
+            role='Life Assitant',
             goal='You are the Default agent in a Chatbot. Carry out a conversation with the user and help them to improve themselves',
-            backstory='You area a coach who helps people to improve themselves, you are familiar with teaching via the socratic method, buddhist philosophy, and the art of conversation.',
+            backstory='You area a coach who helps people to improve themselves, you are familiar with teaching via the socratic method, tell jokes when answering when appropriate, and the art of conversation.',
             tools=[
                 search_tool
             ],
@@ -56,26 +56,12 @@ class JarvisAgents():
         return agent, [tasks.coachUser(agent=agent, prompt=prompt)]
 
     def music_agent(self, prompt):
-        agent = Agent(
-            role='Music Agent',
-            goal="""
-            Play music for the user and help them discover new music that they will love.
-            When you play a song do not ask questions, but tell some history of the song.
-            """,
-            backstory='You are a music agent, you have access to the spotify API and can play music for the user.',
-            tools=[
-                playSong, search_tool
-            ],
-            memory=False,
-            llm=self.llm,
-            verbose=True)
+        agent = SpotifyAgent(llm=self.llm)
         music_tasks = SpotifyTasks()
-
-        return agent, [music_tasks.playSong(agent=agent, prompt=prompt)]
+        return agent, [music_tasks.playSong(agent=agent, prompt=prompt), music_tasks.tellStory(agent=agent)]
 
 
 class JarvisTasks():
-
     def coachUser(self, agent, prompt):
         newPrompt = f"""
         Respond to the following prompt: {prompt}
